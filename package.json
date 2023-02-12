@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build --base=/rutas-toluca2/",
+    "preview": "vite preview -base=/rutas-toluca2/"
   },
   "dependencies": {
     "ol": "^7.2.2",
