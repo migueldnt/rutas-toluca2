@@ -12,7 +12,7 @@
             </p>
         </div>
         <div class="panel-block">
-            <button class="button" @click="delegacionStore.setDelegacionActual('ALL')">
+            <button class="button is-info" @click="delegacionStore.setDelegacionActual('ALL')">
                 Regresar
             </button>
 

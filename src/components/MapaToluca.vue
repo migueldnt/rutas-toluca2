@@ -153,10 +153,13 @@ const delegacionActual = computed(()=>{
         width: 100%;
         height: 100%;
         .ol-zoom{
-            top: 50px;
+            top: 40px;
             button{
                 width: 30px;
                 height: 30px;
+                background-color: hsl(207deg, 61%, 53%);
+                color: white;
+                font-weight: 600;
             }
         }
     }
@@ -164,7 +167,7 @@ const delegacionActual = computed(()=>{
     .zona-flotante {
         position: absolute;
         top: 120px;
-        left: 5px;
+        left: 0px;
         background-color: transparent;
 
     }

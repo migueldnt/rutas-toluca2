@@ -1,5 +1,5 @@
 <template>
-    <button class="button is-info is-small is-rounded" @click="regresar">
+    <button class="button is-info is-small " @click="regresar">
         <span class="material-symbols-outlined is-size-5">
                     home
         </span>
