@@ -1,48 +1,67 @@
 <template>
-    <div class="panel is-primary panel-info">
-        <div class="panel-heading">Delegaciones</div>
-        <div class="panel-block">
-            <p class="control has-icons-left">
-                <input class="input is-primary" type="text" placeholder="Search" v-model="valorBusqueda">
-                <span class="icon is-left">
-                    <i class="fas fa-search" aria-hidden="true"></i>
-                </span>
-            </p>
-        </div>
-        <div class="panel-block is-active" v-for="del in delegacionesFiltro" >
-            <a @click="delegacionStore.setDelegacionActual(del['NODEL'])">
-                {{ del.NOMDEL }}
-            </a>
-            
-        </div>
-    </div>
 
+    <div class="is-flex is-flex-direction-column panel-container" :class="{'colapsed-panel':colapsado}">
+        <div class="is-flex is-justify-content-space-between is-align-items-center">
+            <div class="px-3 titulo">Rutas Toluca</div>
+            <button class="boton-colapsar button is-info is-small" @click="colapsar">
+                <span class="material-symbols-outlined">
+                    {{colapsado? 'keyboard_double_arrow_right': 'keyboard_double_arrow_left'}}
+                </span>
+            </button>
+        </div>
+        <div class="is-flex-grow-1 height-maximo">
+            <Delegaciones v-if="delegacionesVisibles" />
+            <Utbs v-if="!delegacionesVisibles" />
+        </div>
+        
+    </div>
 </template>
 
 <script setup>
-
-import delegacionesLayer from "@/assets/DEL_N.json"
-import { computed, ref } from "@vue/reactivity";
+import Delegaciones from './Delegaciones.vue';
+import Utbs from './Utbs.vue';
 import useDelegacionStore from "../stores/delegacion"
+import { computed, ref } from 'vue';
 
-const delegaciones = delegacionesLayer.features.map(f=>({NODEL:f.properties['NODEL'], NOMDEL:f.properties['NOMDEL']}))
+const delegacionStore = useDelegacionStore();
 
-const delegacionStore = useDelegacionStore()
 
-const valorBusqueda = ref("")
 
-const delegacionesFiltro = computed(()=>{
-    if(valorBusqueda.value.length> 2){
-        return delegaciones.filter(del => del['NOMDEL'].toLowerCase().includes(valorBusqueda.value.toLowerCase()) )
-    }
-
-    return delegaciones
+const delegacionesVisibles = computed(() => {
+    return delegacionStore.delegacionActual === 'ALL'
 })
+
+const colapsado = computed(()=>{
+    return delegacionStore.panelColapsed
+})
+
+function colapsar(){
+    delegacionStore.toggleColapsedPanel()
+}
 
 </script>
 
-<style>
-.panel-info{
-    overflow-y: auto;
+<style lang="scss">
+.panel-container{
+    max-height: 100vh;
+    height: 100vh;
+    &.colapsed-panel{
+        width: 0px;
+        position: relative;
+        .titulo{
+            display: none;
+        }
+
+        .boton-colapsar{
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            z-index: 2
+        }
+    }
+}
+
+.height-maximo{
+    max-height: 100%;
 }
 </style>

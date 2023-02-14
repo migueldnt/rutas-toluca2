@@ -1,16 +1,25 @@
 import { defineStore } from 'pinia'
 import { ref } from "vue"
-import delegaciones from "@/assets/DEL_N.json"
+//import delegaciones from "@/assets/data/DEL_N.json"
 
 const useDelegacionStore = defineStore('delegacion', {
     state() {
         return {
-            delegacionActual: '00'
+            delegacionActual: 'ALL',
+            utbActual:'ALL',
+            panelColapsed:false
         }
     },
     actions: {
         setDelegacionActual(nodel) {
             this.delegacionActual = nodel
+            this.utbActual = 'ALL'
+        },
+        setUTBActual(cveut){
+            this.utbActual = cveut
+        },
+        toggleColapsedPanel(){
+            this.panelColapsed = !this.panelColapsed
         }
     }
 
