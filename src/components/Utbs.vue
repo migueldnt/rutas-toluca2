@@ -19,7 +19,7 @@
         </div>
         <div class="panel-block" v-for="utb in utbsFiltro" :key="utb['CVEUT']">
             <a @click="delegacionStore.setUTBActual(utb['CVEUT'])">
-                {{ utb.NOMUT }}
+                {{utb.CVEUT}} - {{ utb.NOMUT }}
             </a>
 
         </div>
