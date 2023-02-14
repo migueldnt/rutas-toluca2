@@ -20,6 +20,12 @@ const useDelegacionStore = defineStore('delegacion', {
         },
         toggleColapsedPanel(){
             this.panelColapsed = !this.panelColapsed
+        },
+        hideColapsedPanel(){
+            this.panelColapsed = true
+        },
+        showColapsedPanel(){
+            this.panelColapsed = false
         }
     }
 

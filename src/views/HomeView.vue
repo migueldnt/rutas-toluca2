@@ -33,6 +33,8 @@ const colapsado = computed(()=>{
     grid-template-columns: 0px 1fr;
     
   }
+  overflow-y: hidden;
+  overflow-x: hidden;
   
 }
 </style>

@@ -6,6 +6,8 @@
             <BotonRegresar />
         </div>
 
+        <InfoRuta />
+
         <div class="logo-izquierdo">
             <img src="@/assets/logo_toluca.png">
             <img src="@/assets/escudo_toluca.png">
@@ -16,9 +18,10 @@
 
 <script setup>
 import BotonRegresar from "./BotonRegresar.vue"
+import InfoRuta from "./InfoRuta.vue"
 import { onMounted, ref, watch } from 'vue';
 import Map from 'ol/Map.js';
-import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style.js';
+import { Text as TextStyle, Fill, Stroke, Style } from 'ol/style.js';
 import { OSM, Vector as VectorSource } from 'ol/source.js';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js';
 import View from 'ol/View.js';
@@ -37,46 +40,100 @@ const delegacionStore = useDelegacionStore()
 const mapa_div = ref(null)
 let mapa_ol;
 
+
+const styleDelegaciones = (feature)=>{
+    const nomdel = feature.getProperties()["NOMDEL"]
+    return new Style({
+        stroke: new Stroke({
+            color: "#7D1E6A",
+            width: 3
+        }),
+        fill: new Fill({
+            color: "transparent"
+        }),
+        text: new TextStyle({
+            font: 'bold 12px Calibri,sans-serif',
+            text:nomdel,
+            fill: new Fill({color:"#000"}),
+            stroke: new Stroke({color:"#fff",width:5})
+        })
+    })
+}
+
 let capa_delegaciones = new VectorLayer({
     source: new VectorSource({
         url: "DEL_N.json",
         format: new GeoJSON(),
     }),
     visible: true,
-    style: new Style({
-        stroke: new Stroke({
-            color: "#3399CC",
-            width: 3
-        }),
-        fill: new Fill({
-            color: "transparent"
-        })
-    })
+    style: styleDelegaciones
 })
 capa_delegaciones.set("name", "delegaciones")
 
+const styleUtbs = (feature)=>{
+    const nomdel = feature.getProperties()["NOMUT"]
+    return new Style({
+        stroke: new Stroke({
+            color: "#7D1E6A",
+            width: .5
+        }),
+        fill: new Fill({
+            color: "transparent"
+        }),
+        text: new TextStyle({
+            font: '12px Calibri,sans-serif',
+            text:nomdel,
+            fill: new Fill({color:"#000"}),
+            stroke: new Stroke({color:"#fff",width:5})
+        })
+    })
+}
+
+let capa_utbs = new VectorLayer({
+    source: new VectorSource({
+        url: "UTB_N.json",
+        format: new GeoJSON(),
+    }),
+    visible: true,
+    style: styleUtbs
+})
+capa_delegaciones.set("name", "delegaciones")
+
+//rutas
+
+const styleRutas = (feature)=>{
+    const resaltada = feature.get("resalta") === true
+
+    return new Style({
+        stroke: new Stroke({
+            color: resaltada ? "#F73D93" : "#413F42",
+            width: resaltada ? 4 : 2
+        })
+    })
+}
 
 let capa_rutas = new VectorLayer({
     source: new VectorSource({
         features: [],
     }),
     visible: false,
-    style: new Style({
-        stroke: new Stroke({
-            color: "#3d0000",
-            width: 3
-        })
-    })
+    style: styleRutas
 })
 capa_rutas.set("name", "rutas")
+
+//las capas base
+
+const capa_osm_normal = new TileLayer({
+    source: new OSM(),
+    visible:true
+})
 
 onMounted(() => {
     mapa_ol = new Map({
         target: mapa_div.value,
         layers: [
-            new TileLayer({
-                source: new OSM(),
-            }),
+            capa_osm_normal,
+            capa_utbs,
             capa_delegaciones, capa_rutas
         ],
         view: new View({
@@ -132,15 +189,49 @@ const filtrarRutas = (nodel) => {
 
     mapa_ol.getView().fit(capa_rutas.getSource().getExtent(), { duration: 1000 })
     capa_rutas.setVisible(true)
+    delegacionStore.showColapsedPanel()
 }
 
 watch(() => delegacionStore.delegacionActual, (nodel) => {
     filtrarRutas(nodel)
 })
 
+watch(() => delegacionStore.utbActual, (cveut) => {
+    resaltarRutas(cveut)
+})
+
 const delegacionActual = computed(()=>{
     return delegacionStore.delegacionActual
 })
+
+let rutaResaltada = undefined
+function resaltarRutas(cveut){
+    if(rutaResaltada){
+        rutaResaltada.set("resalta",false)
+    }
+    if(cveut === 'ALL'){
+        return
+    }
+    const ruta = capa_rutas.getSource().getFeatures().find(f=>{
+        return f.getProperties()['CVEUT'] === cveut;
+    })
+    
+    if(ruta){
+        ruta.set("resalta",true)
+        mapa_ol.getView().fit(ruta.getGeometry().getExtent(),{duration:1000})
+        rutaResaltada = ruta
+        delegacionStore.hideColapsedPanel()
+    }else{
+        alert("No se encuentra una ruta que coincida con las claves: CVEUT = "+cveut+" y NODEL = "+delegacionActual.value)
+    }
+    
+
+
+    
+
+
+
+}
 
 </script>
 
