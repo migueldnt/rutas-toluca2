@@ -9,7 +9,7 @@
             <tbody>
                 <tr>
                     <td v-for="dia in dias">
-                        <span class="material-symbols-outlined has-text-primary" v-if="dia===0">
+                        <span class="material-symbols-outlined has-text-primary" v-if="dia===1">
                             check_circle
                         </span>
                     </td>

@@ -21,7 +21,7 @@ import BotonRegresar from "./BotonRegresar.vue"
 import InfoRuta from "./InfoRuta.vue"
 import { onMounted, ref, watch } from 'vue';
 import Map from 'ol/Map.js';
-import { Text as TextStyle, Fill, Stroke, Style } from 'ol/style.js';
+import { Text as TextStyle, Fill, Stroke, Style, Circle } from 'ol/style.js';
 import { OSM, Vector as VectorSource } from 'ol/source.js';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer.js';
 import View from 'ol/View.js';
@@ -32,6 +32,7 @@ import GeoJSON from 'ol/format/GeoJSON.js';
 import useDelegacionStore from "../stores/delegacion"
 
 import rutasLayer from "@/assets/data/RUTAS_N_01.json"
+import paradasRutasLayer from "@/assets/data/Paradas_rutas_N.json"
 import { computed } from "@vue/reactivity";
 
 
@@ -121,6 +122,34 @@ let capa_rutas = new VectorLayer({
 })
 capa_rutas.set("name", "rutas")
 
+
+//paradas
+const styleParadas = (feature)=>{
+    const numero = feature.getProperties()["NUM"]
+    return new Style({
+        image: new Circle({
+            fill: new Fill({color:"#00d1b2"}),
+            stroke: new Stroke({color:'white',width:1}),
+            radius: 10,
+        }),
+        text: new TextStyle({
+            font: 'bold 10px Calibri,sans-serif',
+            text:numero+"",
+            fill: new Fill({color:"#000"}),
+            stroke: new Stroke({color:"#fff",width:5}) 
+        })
+    })
+}
+
+let capa_paradas = new VectorLayer({
+    source: new VectorSource({
+        features: []
+    }),
+    visible: false,
+    style:styleParadas
+})
+capa_paradas.set("name","paradas")
+
 //las capas base
 
 const capa_osm_normal = new TileLayer({
@@ -134,7 +163,7 @@ onMounted(() => {
         layers: [
             capa_osm_normal,
             capa_utbs,
-            capa_delegaciones, capa_rutas
+            capa_delegaciones, capa_rutas, capa_paradas
         ],
         view: new View({
             center: [-99.6532400, 19.2878600],
@@ -210,6 +239,7 @@ function resaltarRutas(cveut){
         rutaResaltada.set("resalta",false)
     }
     if(cveut === 'ALL'){
+        apagarParadas()
         return
     }
     const ruta = capa_rutas.getSource().getFeatures().find(f=>{
@@ -221,16 +251,27 @@ function resaltarRutas(cveut){
         mapa_ol.getView().fit(ruta.getGeometry().getExtent(),{duration:1000})
         rutaResaltada = ruta
         delegacionStore.hideColapsedPanel()
+        resaltarParadas(ruta.getProperties()["CVRUTA"])
     }else{
         alert("No se encuentra una ruta que coincida con las claves: CVEUT = "+cveut+" y NODEL = "+delegacionActual.value)
     }
-    
 
+}
 
-    
+function resaltarParadas(cveruta){
+    const paradas_json = paradasRutasLayer.features.filter(parada=>{
+        return parada.properties["CVRUTA"] === cveruta
+    })
+    console.log(cveruta,paradas_json)
+    const geojson = { 'type': 'FeatureCollection', features: paradas_json }
+    capa_paradas.getSource().clear()
+    capa_paradas.getSource().addFeatures(new GeoJSON().readFeatures(geojson))
+    capa_paradas.setVisible(true)
 
-
-
+}
+function apagarParadas(){
+    capa_paradas.getSource().clear()
+    capa_paradas.setVisible(false)
 }
 
 </script>
