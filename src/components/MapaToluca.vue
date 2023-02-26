@@ -133,10 +133,10 @@ const styleParadas = (feature)=>{
             radius: 10,
         }),
         text: new TextStyle({
-            font: 'bold 10px Calibri,sans-serif',
+            font: '10px Calibri,sans-serif',
             text:numero+"",
             fill: new Fill({color:"#000"}),
-            stroke: new Stroke({color:"#fff",width:5}) 
+            stroke: new Stroke({color:"#fff",width:3}) 
         })
     })
 }
@@ -262,7 +262,7 @@ function resaltarParadas(cveruta){
     const paradas_json = paradasRutasLayer.features.filter(parada=>{
         return parada.properties["CVRUTA"] === cveruta
     })
-    console.log(cveruta,paradas_json)
+    //console.log(cveruta,paradas_json)
     const geojson = { 'type': 'FeatureCollection', features: paradas_json }
     capa_paradas.getSource().clear()
     capa_paradas.getSource().addFeatures(new GeoJSON().readFeatures(geojson))

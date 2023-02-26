@@ -13,6 +13,7 @@
                     <p>{{ rutaSeleccionada['NOMUT'] }}, {{ rutaSeleccionada['NOMDEL'] }}</p>
                     <p>Numero económico <b>{{ rutaSeleccionada['ECO'] }}</b></p>
                     <p>KM  <b>{{ rutaSeleccionada['KM'] / 1000 }}</b></p>
+                    <p>Numero de paradas  <b>{{ rutaSeleccionada["NODOS"] }}</b></p>
                     <p><b>Horario</b></p>
                     <Horario :dias="diasValues"/>
                     <p>Entrada: <b>{{ rutaSeleccionada['ENTRADA'] }} hrs</b></p>
